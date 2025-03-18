@@ -40,6 +40,13 @@
                 >
                   登录
                 </v-btn>
+
+                <!-- 注册链接 -->
+                <v-row justify="center" class="mt-1">
+                  <v-col>
+                    <a href="/signup/" class="text-grey-darken-1">创建账号</a>
+                  </v-col>
+                </v-row>
               </v-form>
             </v-card-text>
           </v-card>
@@ -49,19 +56,43 @@
 
     <AppFooter />
   </v-app>
+
+  <v-snackbar v-model="showError" location="top" color="error">
+    {{ errorMsg }}
+  </v-snackbar>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import request from '/src/request.js';
 
 const valid = ref(false);
 const name = ref('');
 const password = ref('');
 
+const showError = ref(false);
+const errorMsg = ref('');
+
 const requiredRule = (value) => !!value || '此字段为必填项';
 
 const login = () => {
-  console.log('登录信息:', { name: name.value, password: password.value });
+  request({
+    method: 'post',
+    url: '/token',
+    data: {
+      name: name.value,
+      password: password.value,
+    },
+  })
+    .then((res) => {
+      const token = res.data.data;
+      localStorage.setItem('token', token);
+      window.location.replace('/');
+    })
+    .catch((err) => {
+      showError.value = true;
+      errorMsg.value = err.response.data?.msg;
+    });
 }
 </script>
 

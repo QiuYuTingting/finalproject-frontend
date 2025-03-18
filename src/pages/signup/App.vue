@@ -44,6 +44,13 @@
                 >
                   注册
                 </v-btn>
+
+                <!-- 登录链接 -->
+                <v-row justify="center" class="mt-1">
+                  <v-col>
+                    <a href="/login/" class="text-grey-darken-1">返回登录</a>
+                  </v-col>
+                </v-row>
               </v-form>
             </v-card-text>
           </v-card>
@@ -53,14 +60,29 @@
 
     <AppFooter />
   </v-app>
+
+  <v-snackbar v-model="showError" location="top" color="error">
+    {{ errorMsg }}
+  </v-snackbar>
+
+  <v-snackbar v-model="showSuccess" location="top" color="success">
+    {{ successMsg }}
+  </v-snackbar>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import request from '/src/request.js';
 
 const valid = ref(false);
 const name = ref('');
 const password = ref('');
+
+const showError = ref(false);
+const errorMsg = ref('');
+
+const showSuccess = ref(false);
+const successMsg = ref('');
 
 const NAME_HINT = '用户名只能由英文字母、数字、下划线和短横组成。长度应为 2-15 个字符。';
 const PASSWORD_HINT = '密码长度应为 8-72 个字符';
@@ -74,7 +96,23 @@ const passwordRules = (value) => {
 }
 
 const submit = () => {
-  console.log('注册信息:', { name: name.value, password: password.value })
+  request({
+    method: 'post',
+    url: '/users',
+    data: {
+      name: name.value,
+      password: password.value,
+    },
+  })
+    .then(() => {
+      showSuccess.value = true;
+      successMsg.value = '创建成功，正在返回登录！';
+      setTimeout(() => window.location.replace('/login/'), 1000);
+    })
+    .catch((err) => {
+      showError.value = true;
+      errorMsg.value = err.response.data?.msg;
+    });
 }
 </script>
 
