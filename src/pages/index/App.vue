@@ -94,11 +94,14 @@
             <!-- 用户头像 -->
             <v-menu v-model="userMenu" offset-y>
               <template v-slot:activator="{ props }">
-                <v-btn icon v-bind="props" class="ml-2">
-                  <v-avatar size="40" class="border border-white" color="primary">
-                    <!-- TODO: 展示真实的头像或用户名首字母 -->
-                    <v-img v-if="false" src=""></v-img>
-                    <span v-else class="text-white text-h6">{{ 'W' }}</span>
+                <v-btn icon v-bind="props" class="ml-2" :loading="userIsLoading" :title="userError?.message || ''">
+                  <!-- 加载失败显示一个红色感叹号 -->
+                  <v-icon v-if="userError" color="error">mdi-alert-circle</v-icon>
+                  <v-avatar v-else-if="userState" size="40" class="border border-white" color="primary">
+                    <!-- 有头像显示头像 -->
+                    <v-img v-if="userState.avatar" :src="userState.avatar"></v-img>
+                    <!-- 没头像显示用户名首字母 -->
+                    <span v-else-if="userState.name" class="text-white text-h6">{{ userState.name[0] }}</span>
                   </v-avatar>
                 </v-btn>
               </template>
@@ -132,6 +135,29 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useAsyncState } from '@vueuse/core'
+import request from '/src/request.js';
+
+const {
+  state: userState,
+  error: userError,
+  isLoading: userIsLoading,
+} = useAsyncState(async () => {
+  try {
+    const response = await request({
+      method: 'get',
+      url: '/users/me',
+    });
+
+    return response.data.data;
+  } catch (err) {
+    if (err.name === 'AxiosError') {
+      throw new Error(err.response.data?.msg || '服务异常！');
+    }
+
+    throw err;
+  }
+});
 
 const userMenu = ref(false); // 控制用户头像菜单的显示
 const addMenu = ref(false); // 控制“创建和添加照片”菜单的显示
