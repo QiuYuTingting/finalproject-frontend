@@ -41,7 +41,7 @@
     <v-main>
       <!-- 页头 -->
       <v-app-bar flat>
-        <v-container class="d-flex align-center justify-space-between">
+        <v-container fluid class="d-flex align-center justify-space-between">
           <!-- 搜索框 -->
           <v-text-field
             density="compact"
@@ -126,11 +126,22 @@
       </v-app-bar>
 
       <!-- 主体内容 -->
-      <v-container>
+      <v-container fluid>
         <router-view></router-view>
       </v-container>
     </v-main>
   </v-app>
+
+  <input
+    type="file"
+    multiple
+    ref="fileInputRef"
+    accept="image/*"
+    style="display: none"
+    @change="handleFileChange"
+  >
+
+  <UploadProgress ref="uploadProgressRef"></UploadProgress>
 </template>
 
 <script setup>
@@ -162,8 +173,49 @@ const {
 const userMenu = ref(false); // 控制用户头像菜单的显示
 const addMenu = ref(false); // 控制“创建和添加照片”菜单的显示
 
+const fileInputRef = ref(null); // 引用隐藏的 input[type="file"] 元素
+const uploadProgressRef = ref(null); // 引用文件上传状态的组件
+
+async function handleFileChange(event) {
+  const files = event.target?.files;
+
+  if (!files || !files.length) return;
+
+  const formData = new FormData();
+
+  for (const file of files) {
+    formData.append('photos', file);
+  }
+
+  try {
+    const response = await request({
+      method: 'post',
+      url: '/photos',
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        console.log(progressEvent);
+        uploadProgressRef.value?.open({
+          count: files.length,
+          event: progressEvent,
+        });
+      },
+    });
+
+    console.log('上传成功', response.data);
+  } catch (err) {
+    console.error('上传失败', err);
+  }
+}
+
 function onClickUploadPhoto() {
-  alert('TODO: 打开系统文件选择并处理照片上传');
+  if (!fileInputRef.value) {
+    alert('出错了！');
+  }
+
+  fileInputRef.value.click();
 }
 
 function onClickCreateAlbum() {
