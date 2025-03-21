@@ -131,18 +131,24 @@
 
       <!-- 主体内容 -->
       <v-container fluid>
-        <router-view></router-view>
+        <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component" ref="CurrentViewRef"></component>
+          </keep-alive>
+        </router-view>
       </v-container>
     </v-main>
   </v-app>
 
-  <PhotosUploader ref="PhotosUploaderRef"></PhotosUploader>
+  <PhotosUploader ref="PhotosUploaderRef" @success="onPhotosUploaded"></PhotosUploader>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useAsyncState } from '@vueuse/core'
 import request from '/src/request.js';
+
+// TODO: 侧边栏关闭时需要提供一个打开按钮
 
 /**
  * 获取用户信息
@@ -170,7 +176,7 @@ const {
 
 const userMenu = ref(false); // 控制用户头像菜单的显示
 const addMenu = ref(false); // 控制“创建和添加照片”菜单的显示
-
+const CurrentViewRef = ref(null); // 引用当前路由页面对应的视图
 const PhotosUploaderRef = ref(null); // 引用文件上传组件
 /**
  * 点击“从计算机上传”时，调用文件上传组件的 open 方法开始选择文件
@@ -181,6 +187,14 @@ function onClickUploadPhoto() {
   }
 
   PhotosUploaderRef.value.open();
+}
+
+/**
+ * 图片上传组件上传成功时触发此事件回调
+ */
+function onPhotosUploaded() {
+  // 若当前路由对应的视图组件有 refreshPhotos 方法，则调用之
+  CurrentViewRef.value?.refreshPhotos?.();
 }
 
 function onClickCreateAlbum() {

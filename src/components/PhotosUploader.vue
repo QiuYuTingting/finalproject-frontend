@@ -78,6 +78,8 @@ import request from '/src/request.js';
 import { formatSize } from '/src/utils/formatSize.js';
 import { formatDuration } from '/src/utils/formatDuration.js';
 
+const emit = defineEmits(['success', 'failed']);
+
 const showStatus = ref(false); // 是否显示上传状态
 const status = ref(''); // 上传状态的可能的值有: processing / success / failed
 const count = ref(0); // 正在上传的文件数量
@@ -111,8 +113,6 @@ async function handleFileChange(event) {
       },
       timeout: 0, // 不限制超时
       onUploadProgress: (pEvent) => {
-        console.log(pEvent);
-
         count.value = files.length;
         progressEvent.value = pEvent;
         status.value = 'processing';
@@ -120,11 +120,11 @@ async function handleFileChange(event) {
     });
 
     status.value = 'success';
+    emit('success');
   } catch (err) {
-    console.error('上传失败', err);
-
     status.value = 'failed';
     errorMessage.value = err.message;
+    emit('failed');
   }
 }
 
