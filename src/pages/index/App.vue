@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <!-- 侧边栏 -->
-    <v-navigation-drawer app class="px-3">
+    <v-navigation-drawer app class="px-3 lighten-surface">
       <!-- 应用名 -->
       <div class="pa-4 text-h6 font-weight-bold">智能相册系统</div>
 
@@ -40,7 +40,7 @@
     <!-- 右侧主体 -->
     <v-main>
       <!-- 页头 -->
-      <v-app-bar flat>
+      <v-app-bar flat class="lighten-surface">
         <v-container fluid class="d-flex align-center justify-space-between">
           <!-- 搜索框 -->
           <v-text-field
@@ -132,16 +132,7 @@
     </v-main>
   </v-app>
 
-  <input
-    type="file"
-    multiple
-    ref="fileInputRef"
-    accept="image/*"
-    style="display: none"
-    @change="handleFileChange"
-  >
-
-  <UploadProgress ref="uploadProgressRef"></UploadProgress>
+  <PhotosUploader ref="PhotosUploaderRef"></PhotosUploader>
 </template>
 
 <script setup>
@@ -149,6 +140,9 @@ import { ref } from 'vue';
 import { useAsyncState } from '@vueuse/core'
 import request from '/src/request.js';
 
+/**
+ * 获取用户信息
+ */
 const {
   state: userState,
   error: userError,
@@ -173,49 +167,16 @@ const {
 const userMenu = ref(false); // 控制用户头像菜单的显示
 const addMenu = ref(false); // 控制“创建和添加照片”菜单的显示
 
-const fileInputRef = ref(null); // 引用隐藏的 input[type="file"] 元素
-const uploadProgressRef = ref(null); // 引用文件上传状态的组件
-
-async function handleFileChange(event) {
-  const files = event.target?.files;
-
-  if (!files || !files.length) return;
-
-  const formData = new FormData();
-
-  for (const file of files) {
-    formData.append('photos', file);
-  }
-
-  try {
-    const response = await request({
-      method: 'post',
-      url: '/photos',
-      data: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      onUploadProgress: (progressEvent) => {
-        console.log(progressEvent);
-        uploadProgressRef.value?.open({
-          count: files.length,
-          event: progressEvent,
-        });
-      },
-    });
-
-    console.log('上传成功', response.data);
-  } catch (err) {
-    console.error('上传失败', err);
-  }
-}
-
+const PhotosUploaderRef = ref(null); // 引用文件上传组件
+/**
+ * 点击“从计算机上传”时，调用文件上传组件的 open 方法开始选择文件
+ */
 function onClickUploadPhoto() {
-  if (!fileInputRef.value) {
+  if (!PhotosUploaderRef.value) {
     alert('出错了！');
   }
 
-  fileInputRef.value.click();
+  PhotosUploaderRef.value.open();
 }
 
 function onClickCreateAlbum() {
@@ -231,5 +192,9 @@ function onClickLogout() {
 <style scoped>
 .v-navigation-drawer--left {
   border-right: none;
+}
+
+.v-theme--light .lighten-surface {
+  --v-theme-surface: 240, 244, 249;
 }
 </style>
