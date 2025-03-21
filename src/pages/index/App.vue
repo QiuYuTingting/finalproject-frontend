@@ -1,7 +1,11 @@
 <template>
   <v-app>
     <!-- 侧边栏 -->
-    <v-navigation-drawer app class="px-3 lighten-surface">
+    <v-navigation-drawer
+      app
+      disable-resize-watcher
+      class="px-3 lighten-surface"
+    >
       <!-- 应用名 -->
       <div class="pa-4 text-h6 font-weight-bold">智能相册系统</div>
 

@@ -79,6 +79,7 @@ const login = () => {
   request({
     method: 'post',
     url: '/token',
+    withCredentials: true, // 关键：必须启用 Cookie 传递
     data: {
       name: name.value,
       password: password.value,

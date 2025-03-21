@@ -18,7 +18,7 @@
       <v-alert
         title="上传成功"
         type="success"
-        variant="plain"
+        variant="text"
         :text="`新增 ${count} 个照片`"
       ></v-alert>
     </div>
@@ -26,7 +26,7 @@
       <v-alert
         title="上传失败"
         type="error"
-        variant="plain"
+        variant="text"
         :text="errorMessage || ''"
       ></v-alert>
     </div>
@@ -49,6 +49,10 @@
       <p>{{ formatSize(progressEvent.rate ?? 0) }}/s</p>
 
       <p>估计剩余时间：{{ formatDuration((progressEvent.estimated ?? 0) * 1000) }}</p>
+    </div>
+    <div v-else>
+      <p class="text-h5 mb-4">正在处理</p>
+      <v-progress-linear striped :model-value="100" height="8" color="primary" class="my-2" />
     </div>
 
     <template v-slot:actions>
@@ -153,10 +157,5 @@ defineExpose({
 </script>
 
 <style scoped>
-:deep(.v-snackbar--variant-plain) {
-  opacity: 1 !important;
-}
-:deep(.v-alert--variant-plain) {
-  opacity: 1 !important;
-}
+
 </style>
