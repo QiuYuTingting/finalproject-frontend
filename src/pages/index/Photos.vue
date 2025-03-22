@@ -1,17 +1,20 @@
 <template>
-  <div v-if="isLoading" class="d-flex">
-    <v-skeleton-loader type="image" width="200" class="mr-2"></v-skeleton-loader>
-    <v-skeleton-loader type="image" width="200" class="mr-2"></v-skeleton-loader>
-    <v-skeleton-loader type="image" width="200" class="mr-2"></v-skeleton-loader>
-  </div>
-  <div v-else-if="error">
-    <v-alert type="error" variant="text" title="出错了">
-      {{ error.message }}
-    </v-alert>
-  </div>
-  <div v-else-if="photos" class="d-flex flex-wrap">
+  <div class="d-flex flex-wrap">
+    <v-skeleton-loader
+      v-if="isLoading"
+      type="image"
+      width="200"
+      class="mr-2"
+    ></v-skeleton-loader>
+
+    <div v-else-if="error">
+      <v-alert type="error" variant="text" title="出错了">
+        {{ error.message }}
+      </v-alert>
+    </div>
+
     <v-img
-      v-for="photo in photos"
+      v-for="photo in (photos || [])"
       :key="photo._id"
       :src="photo.src"
       :lazy-src="photo.src"
@@ -38,16 +41,7 @@
 import { useAsyncState } from '@vueuse/core'
 import request from '/src/request.js';
 
-// TODO: 避免调用 execute 刷新列表时的页面闪烁（即重新加载所有图片）（可能需要把 photos 作为单独的 ref 对象）
-// TODO: 图片加载没有利用浏览器缓存，浏览器每次都从服务器重新加载图片。可能和HTTP请求头有关
-// Cache-Control: public, max-age=86400
-// ETag: "abc123"
-// Last-Modified: Mon, 17 Mar 2025 12:00:00 GMT
-
-
-/**
- * 获取用户照片列表
- */
+// 获取用户照片列表
 const {
   state: photos,
   error,
@@ -68,6 +62,8 @@ const {
 
     throw err;
   }
+}, {}, {
+  resetOnExecute: false, // 二次执行 execute 时，请求完成才覆盖 state 以避免页面“闪烁”
 });
 
 defineExpose({

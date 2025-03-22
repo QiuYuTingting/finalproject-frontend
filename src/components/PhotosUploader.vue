@@ -12,7 +12,6 @@
     v-model="showStatus"
     timeout="-1"
     location="bottom right"
-    variant="tonal"
   >
     <div v-if="status === 'success'">
       <v-alert

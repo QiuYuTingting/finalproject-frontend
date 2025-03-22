@@ -1,7 +1,7 @@
 <template>
   <v-app class="background">
     <v-container fill-height>
-      <v-row justify="center" align="center" style="min-height: calc(100vh - 60px); /* TODO: 60px 换成变量 */">
+      <v-row justify="center" align="center" style="min-height: calc(100vh - 60px);">
         <v-col cols="12" sm="8" md="4">
           <v-card class="pa-6" elevation="10">
             <v-card-title class="text-h5">

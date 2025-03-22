@@ -5,6 +5,7 @@
       app
       disable-resize-watcher
       class="px-3 lighten-surface"
+      v-model="drawer"
     >
       <!-- 应用名 -->
       <div class="pa-4 text-h6 font-weight-bold">智能相册系统</div>
@@ -46,15 +47,23 @@
       <!-- 页头 -->
       <v-app-bar flat class="lighten-surface">
         <v-container fluid class="d-flex align-center justify-space-between">
-          <!-- 搜索框 -->
-          <v-text-field
-            density="compact"
-            hide-details
-            variant="outlined"
-            prepend-inner-icon="mdi-magnify"
-            placeholder="搜索"
-            style="max-width: 450px;"
-          ></v-text-field>
+          <div class="d-flex align-center">
+            <v-app-bar-nav-icon
+              variant="text"
+              @click.stop="drawer = !drawer"
+              class="mr-8"
+            ></v-app-bar-nav-icon>
+
+            <!-- 搜索框 -->
+            <v-text-field
+              density="compact"
+              hide-details
+              variant="outlined"
+              prepend-inner-icon="mdi-magnify"
+              placeholder="搜索"
+              style="max-width: 450px; width: 450px;"
+            ></v-text-field>
+          </div>
 
           <!-- 右侧操作按钮 -->
           <div class="d-flex align-center">
@@ -148,11 +157,7 @@ import { ref } from 'vue';
 import { useAsyncState } from '@vueuse/core'
 import request from '/src/request.js';
 
-// TODO: 侧边栏关闭时需要提供一个打开按钮
-
-/**
- * 获取用户信息
- */
+// 获取用户信息
 const {
   state: userState,
   error: userError,
@@ -174,6 +179,7 @@ const {
   }
 });
 
+const drawer = ref(true); // 控制菜单栏是否打开
 const userMenu = ref(false); // 控制用户头像菜单的显示
 const addMenu = ref(false); // 控制“创建和添加照片”菜单的显示
 const CurrentViewRef = ref(null); // 引用当前路由页面对应的视图
