@@ -1,5 +1,24 @@
 <template>
-  <div class="d-flex flex-wrap">
+  <v-toolbar
+    v-if="selected.length"
+    app
+    flat
+    class="lighten-surface toolbar"
+  >
+    <template v-slot:prepend>
+      <v-btn icon="mdi-close" @click="selected.length = 0"></v-btn>
+    </template>
+
+    <v-toolbar-title :text="`已选择 ${ selected.length } 项内容`"></v-toolbar-title>
+
+    <template v-slot:append>
+      <v-btn icon="mdi-plus" title="添加到相册"></v-btn>
+      <v-btn icon="mdi-delete" title="移至回收站"></v-btn>
+      <v-btn icon="mdi-dots-vertical" title="更多选项"></v-btn>
+    </template>
+  </v-toolbar>
+
+  <div>
     <v-skeleton-loader
       v-if="isLoading && !state?.photos?.length"
       type="image"
@@ -13,32 +32,51 @@
       </v-alert>
     </div>
 
-    <v-img
-      v-for="photo in (state?.photos || [])"
-      :key="photo._id"
-      :src="photo.src"
-      :lazy-src="photo.src"
-      :width="200"
-      :max-width="200"
-      :aspect-ratio="1"
-      class="ma-1"
-      cover
-    >
-      <!-- 图片加载失败时显示的默认图片 -->
-      <template v-slot:error>
-        <v-img
-          class="mx-auto"
-          height="200"
-          width="200"
-          src="/src/assets/image-placeholder.svg"
-        ></v-img>
-      </template>
-    </v-img>
+    <v-item-group v-model="selected" multiple class="d-flex flex-wrap">
+      <v-item
+        v-for="photo in (state?.photos || [])"
+        :key="photo._id"
+        :value="photo._id"
+        v-slot="{ isSelected, toggle }"
+      >
+        <div
+          class="ma-1 photo"
+          :class="[
+            isSelected && 'photo--selected',
+            isAnyOneSelected && 'photo--waiting_selected',
+          ]"
+          @click="() => isAnyOneSelected ? toggle() : previewPhoto(photo)"
+        >
+          <v-img
+            :src="photo.src"
+            :lazy-src="photo.src"
+            :width="200"
+            :max-width="200"
+            :aspect-ratio="1"
+            class="photo__img"
+            cover
+          >
+            <!-- 图片加载失败时显示的默认图片 -->
+            <template v-slot:error>
+              <v-img height="200" width="200" src="/src/assets/image-placeholder.svg"></v-img>
+            </template>
+          </v-img>
+
+          <v-checkbox-btn
+            :model-value="isSelected"
+            @click.stop="toggle"
+            class="photo__checkbox"
+            color="primary"
+          ></v-checkbox-btn>
+        </div>
+      </v-item>
+    </v-item-group>
   </div>
   <v-btn @click="nextPage">下一页</v-btn>
 </template>
 
 <script setup>
+import { ref, computed } from 'vue';
 import { useAsyncState } from '@vueuse/core'
 import request from '/src/request.js';
 
@@ -83,11 +121,60 @@ function nextPage() {
   execute(0, { cursor: state.value?.cursor });
 }
 
+const selected = ref([]);
+const isAnyOneSelected = computed(() => !!selected.value?.length);
+
+function previewPhoto(photo) {
+  console.log('TODO: previewPhoto: ', photo);
+}
+
 defineExpose({
   refreshPhotos: execute,
 });
 </script>
 
 <style scoped>
+.toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+}
 
+.photo {
+  width: 200px;
+  height: 200px;
+  max-width: 200px;
+  max-height: 200px;
+  overflow: hidden;
+  position: relative;
+  transition: .2s;
+  background-color: #e9eef6;
+}
+
+.photo__img {
+  transition: .2s;
+}
+
+.photo__checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: none;
+}
+
+.photo--waiting_selected .photo__checkbox,
+.photo--selected .photo__checkbox,
+.photo:hover .photo__checkbox {
+  display: block;
+}
+
+.photo--selected .photo__img {
+  transform: scale(0.8);
+  border-radius: 6px;
+}
+
+.v-theme--light .lighten-surface {
+  --v-theme-surface-light: 240, 244, 249;
+}
 </style>
