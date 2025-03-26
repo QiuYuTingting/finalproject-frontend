@@ -32,6 +32,15 @@
           </template>
           <v-list-item-title>人物</v-list-item-title>
         </v-list-item>
+
+        <v-list-subheader class="my-4">其它</v-list-subheader>
+
+        <v-list-item link to="/trashbin" class="rounded-pill py-3 px-6">
+          <template v-slot:prepend>
+            <v-icon>mdi-delete</v-icon>
+          </template>
+          <v-list-item-title>回收站</v-list-item-title>
+        </v-list-item>
       </v-list>
 
       <!-- 侧边栏页脚 -->

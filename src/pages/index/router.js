@@ -7,6 +7,10 @@ const routes = [
     component: Photos,
   },
   {
+    path: '/trashbin',
+    component: () => import('./Trashbin'),
+  },
+  {
     path: '/albums',
     component: () => import('./Albums'),
   },
