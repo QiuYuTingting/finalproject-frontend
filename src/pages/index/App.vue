@@ -151,7 +151,7 @@
       <v-container fluid>
         <router-view v-slot="{ Component }">
           <keep-alive>
-            <component :is="Component" ref="CurrentViewRef"></component>
+            <component :is="Component" ref="CurrentViewRef" :key="route.params.id || route.name"></component>
           </keep-alive>
         </router-view>
       </v-container>
@@ -164,7 +164,11 @@
 <script setup>
 import { ref } from 'vue';
 import { useAsyncState } from '@vueuse/core'
+import { useRoute, useRouter } from "vue-router";
 import request from '/src/request.js';
+
+const route = useRoute();
+const router = useRouter();
 
 // 获取用户信息
 const {
@@ -213,7 +217,7 @@ function onPhotosUploaded() {
 }
 
 function onClickCreateAlbum() {
-  alert('TODO: 创建临时相册并跳转到相册初始化页面');
+  router.push('/album/new');
 }
 
 function onClickLogout() {

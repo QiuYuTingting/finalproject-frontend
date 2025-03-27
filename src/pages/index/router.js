@@ -15,6 +15,18 @@ const routes = [
     component: () => import('./Albums'),
   },
   {
+    path: '/album/:id',
+    component: () => import('./Album'),
+  },
+  {
+    path: '/album/new',
+    component: () => import('./AlbumNew'),
+  },
+  {
+    path: '/album',
+    redirect: '/album/new',
+  },
+  {
     path: '/people',
     component: () => import('./People'),
   },
