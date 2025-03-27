@@ -14,21 +14,21 @@
       <v-list density="compact">
         <v-list-item link to="/" class="rounded-pill py-3 px-6">
           <template v-slot:prepend>
-            <v-icon>mdi-image</v-icon>
+            <v-icon>mdi-image-multiple</v-icon>
           </template>
           <v-list-item-title>照片</v-list-item-title>
         </v-list-item>
 
         <v-list-item link to="/albums" class="rounded-pill py-3 px-6">
           <template v-slot:prepend>
-            <v-icon>mdi-folder-multiple-image</v-icon>
+            <v-icon>mdi-view-gallery</v-icon>
           </template>
           <v-list-item-title>相册</v-list-item-title>
         </v-list-item>
 
         <v-list-item link to="/people" class="rounded-pill py-3 px-6">
           <template v-slot:prepend>
-            <v-icon>mdi-account-group</v-icon>
+            <v-icon>mdi-human</v-icon>
           </template>
           <v-list-item-title>人物</v-list-item-title>
         </v-list-item>
@@ -37,7 +37,7 @@
 
         <v-list-item link to="/trashbin" class="rounded-pill py-3 px-6">
           <template v-slot:prepend>
-            <v-icon>mdi-delete</v-icon>
+            <v-icon>mdi-trash-can</v-icon>
           </template>
           <v-list-item-title>回收站</v-list-item-title>
         </v-list-item>
