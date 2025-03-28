@@ -150,7 +150,7 @@
       <!-- 主体内容 -->
       <v-container fluid>
         <router-view v-slot="{ Component }">
-          <keep-alive>
+          <keep-alive include="Photos">
             <component :is="Component" ref="CurrentViewRef" :key="route.params.id || route.name"></component>
           </keep-alive>
         </router-view>
