@@ -57,6 +57,7 @@ export default defineConfig({
         index: path.resolve(__dirname, 'index.html'),
         login: path.resolve(__dirname, 'login/index.html'),
         signup: path.resolve(__dirname, 'signup/index.html'),
+        admin: path.resolve(__dirname, 'admin/index.html'),
       },
     },
   },
