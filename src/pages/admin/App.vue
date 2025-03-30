@@ -87,6 +87,12 @@
               </template>
 
               <v-list class="pa-4">
+                <v-list-item link class="rounded-pill px-4" @click="onClickLeaveAdmin">
+                  <template v-slot:prepend>
+                    <v-icon>mdi-exit-run</v-icon>
+                  </template>
+                  <v-list-item-title>退出管理后台</v-list-item-title>
+                </v-list-item>
                 <v-list-item link class="rounded-pill px-4" @click="onClickLogout">
                   <template v-slot:prepend>
                     <v-icon>mdi-logout</v-icon>
@@ -140,6 +146,10 @@ const {
 
 const drawer = ref(true); // 控制菜单栏是否打开
 const userMenu = ref(false); // 控制用户头像菜单的显示
+
+function onClickLeaveAdmin() {
+  window.location.replace('/');
+}
 
 function onClickLogout() {
   localStorage.removeItem('token');

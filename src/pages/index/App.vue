@@ -135,6 +135,12 @@
                   </template>
                   <v-list-item-title>编辑个人信息</v-list-item-title>
                 </v-list-item>
+                <v-list-item v-if="userState?.is_admin" link @click="onClickEnterAdmin" class="rounded-pill px-4">
+                  <template v-slot:prepend>
+                    <v-icon>mdi-door-sliding-lock</v-icon>
+                  </template>
+                  <v-list-item-title>进入管理后台</v-list-item-title>
+                </v-list-item>
                 <v-list-item link class="rounded-pill px-4" @click="onClickLogout">
                   <template v-slot:prepend>
                     <v-icon>mdi-logout</v-icon>
@@ -169,6 +175,10 @@ import request from '/src/request.js';
 
 const route = useRoute();
 const router = useRouter();
+
+function onClickEnterAdmin() {
+  window.location.replace('/admin/');
+}
 
 // 获取用户信息
 const {
