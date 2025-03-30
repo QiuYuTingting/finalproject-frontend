@@ -98,5 +98,7 @@ const login = () => {
 </script>
 
 <style scoped>
-
+.background {
+  background: url(/gallery.svg) no-repeat;
+}
 </style>
