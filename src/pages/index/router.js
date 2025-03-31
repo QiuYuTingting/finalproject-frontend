@@ -32,6 +32,14 @@ const routes = [
     component: () => import('./People'),
   },
   {
+    path: '/person/:id',
+    component: () => import('./Person'),
+  },
+  {
+    path: '/person',
+    redirect: '/people',
+  },
+  {
     path: '/settings',
     component: () => import('./Settings'),
   },

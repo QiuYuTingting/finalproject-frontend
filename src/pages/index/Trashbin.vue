@@ -109,7 +109,7 @@ const {
       method: 'get',
       url: '/photos',
       params: {
-        pagesize: 5,
+        pagesize: 50,
         cursor: args?.cursor,
         mode: 'trashed',
       },
