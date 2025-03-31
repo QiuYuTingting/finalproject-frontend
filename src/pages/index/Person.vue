@@ -2,7 +2,10 @@
   <v-row align="center" justify="space-between">
     <v-col cols="auto">
       <div v-if="personIsLoading">加载中……</div>
-      <div v-else-if="personError">{{ personError.message }}</div>
+      <div v-else-if="personError">
+        <p class="text-error">{{ personError.message }}</p>
+      </div>
+
       <div v-else class="d-flex">
         <v-avatar size="32" class="border border-white mr-4" color="primary">
           <v-img :src="person?.reference_face_base64 ? `data:image/jpeg;base64, ${person.reference_face_base64}` : '/src/assets/image-placeholder.svg'"></v-img>
@@ -47,6 +50,7 @@
           :aspect-ratio="1"
           class="photo__img"
           cover
+          @click="() => previewPhoto(photo)"
         >
           <!-- 图片加载失败时显示的默认图片 -->
           <template v-slot:error>
@@ -152,6 +156,10 @@ const {
 
 function nextPage() {
   execute(0, { cursor: state.value?.cursor });
+}
+
+function previewPhoto(photo) {
+  router.push(`/photo/${photo._id}`);
 }
 
 const dialog = ref(false);

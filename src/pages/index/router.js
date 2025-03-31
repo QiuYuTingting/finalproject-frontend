@@ -8,6 +8,14 @@ const routes = [
     component: Photos,
   },
   {
+    path: '/photo/:id',
+    component: () => import('./Photo'),
+  },
+  {
+    path: '/photo',
+    redirect: '/',
+  },
+  {
     path: '/trashbin',
     component: () => import('./Trashbin'),
   },

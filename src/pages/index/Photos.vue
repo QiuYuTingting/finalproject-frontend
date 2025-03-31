@@ -80,7 +80,11 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useAsyncState } from '@vueuse/core'
+import { useRoute, useRouter } from 'vue-router';
 import request from '/src/request.js';
+
+const route = useRoute();
+const router = useRouter();
 
 // 获取用户照片列表
 const {
@@ -134,7 +138,7 @@ function refreshPhotos() {
 }
 
 function previewPhoto(photo) {
-  console.log('TODO: previewPhoto: ', photo);
+  router.push(`/photo/${photo._id}`);
 }
 
 // 是否显示 snackbar
