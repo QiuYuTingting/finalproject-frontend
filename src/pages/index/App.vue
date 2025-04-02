@@ -104,15 +104,14 @@
                 </v-list-item>
               </v-list>
             </v-menu>
-
-
+<!--
             <v-btn icon title="设置" to="/settings">
               <v-icon>mdi-cog</v-icon>
             </v-btn>
             <v-btn icon title="帮助" to="/help">
               <v-icon>mdi-help-circle-outline</v-icon>
             </v-btn>
-
+ -->
             <!-- 用户头像 -->
             <v-menu v-model="userMenu" offset-y>
               <template v-slot:activator="{ props }">

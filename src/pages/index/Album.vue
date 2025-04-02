@@ -4,6 +4,9 @@
       <p class="text-h5">{{ album?.name || '相册' }}</p>
     </v-col>
     <v-col cols="auto">
+      <v-btn variant="text" icon title="添加照片" @click="showPhotosSelector = true">
+        <v-icon>mdi-plus-box-multiple</v-icon>
+      </v-btn>
       <v-btn variant="text" icon title="删除相册" @click="onClickDeleteAlbum">
         <v-icon>mdi-delete</v-icon>
       </v-btn>
@@ -12,11 +15,19 @@
 
   <v-divider class="my-4"></v-divider>
 
+  <Gallery ref="GalleryRef" v-model:selected="selected" :extraParams="{ album_id: route.params.id }"></Gallery>
+
   <v-snackbar v-model="snackbar"> {{ snackbarText }} </v-snackbar>
+
+  <PhotosSelector
+    v-model:show="showPhotosSelector"
+    :excludeAlbum="album"
+    @change="onSelectNewPhotos"
+  ></PhotosSelector>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import dayjs from 'dayjs';
 import { useRoute, useRouter } from 'vue-router';
 import { useAsyncState } from '@vueuse/core';
@@ -28,7 +39,7 @@ const router = useRouter();
 // 获取相册详情
 const {
   state: album,
-  error,
+  error, // TODO 模仿 person 页面展示错误信息
   isLoading,
   execute,
 } = useAsyncState(async () => {
@@ -77,6 +88,61 @@ async function onClickDeleteAlbum() {
     }
   }
 }
+
+// 选中的照片列表
+const selected = ref([]); // TODO: 开发从相册中移除照片的功能
+const GalleryRef = ref(null);
+
+function refreshPhotos() {
+  showPhotosSelector.value = false;
+  selected.value = false;
+  GalleryRef.value?.refresh();
+}
+
+// 显示添加照片对话框
+const showPhotosSelector = ref(false);
+
+// 将新照片添加到相册
+async function onSelectNewPhotos(newPhotos) {
+  if (!Array.isArray(newPhotos) || !newPhotos.length) {
+    showPhotosSelector.value = false;
+    return;
+  }
+
+  try {
+    const response = await request({
+      method: 'patch',
+      url: '/photos',
+      data: {
+        ids: newPhotos,
+        updates: {
+          'albums__append_one': route.params.id,
+        },
+      },
+    });
+
+    const { matchedCount, modifiedCount } = response.data.data;
+
+    snackbarText.value = matchedCount && modifiedCount
+      ? `已将 ${modifiedCount} 个照片（共 ${matchedCount} 个）添加到相册`
+      : response.data.msg;
+    snackbar.value = true;
+
+    refreshPhotos();
+  } catch (e) {
+    console.error(e);
+    snackbarText.value = e.name === 'AxiosError'
+      ? e.response.data?.msg || '服务异常！'
+      : e.message;
+    snackbar.value = true;
+  }
+}
+
+onMounted(() => {
+  if (route.query.mode === 'add_photos') {
+    showPhotosSelector.value = true;
+  }
+});
 </script>
 
 <style scoped>

@@ -11,8 +11,16 @@
         <p class="text-h5">照片</p>
       </div>
     </v-col>
-    <v-col cols="auto">
-      <v-btn variant="text" icon title="删除照片">
+    <v-col cols="auto" v-if="photo?.status === 'trashed'">
+      <v-btn variant="text" icon title="恢复" @click="onClickUntrash">
+        <v-icon>mdi-restore</v-icon>
+      </v-btn>
+      <v-btn variant="text" icon title="永久删除" @click="onClickDeleteForever">
+        <v-icon>mdi-delete-forever</v-icon>
+      </v-btn>
+    </v-col>
+    <v-col cols="auto" v-else>
+      <v-btn variant="text" icon title="删除照片" @click="onClickTrashbin">
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-col>
@@ -38,8 +46,8 @@
         <v-list-subheader class="my-4" v-if="photo.faces?.length">人物</v-list-subheader>
 
         <v-list-item
-          v-for="face in (photo.faces || [])/*.filter((face) => face.distance_from_who < 0.5)*/"
-          :key="face.who"
+          v-for="(face, index) in (photo.faces || [])/*.filter((face) => face.distance_from_who < 0.5)*/"
+          :key="`${face.who}_${index}`"
           link
           :to="`/person/${face.who}`"
         >
@@ -115,6 +123,9 @@ const {
   }
 });
 
+const onClickDeleteForever = () => { alert('TODO') }
+const onClickTrashbin = () => { alert('TODO') }
+const onClickUntrash = () => { alert('TODO') }
 </script>
 
 <style scoped>

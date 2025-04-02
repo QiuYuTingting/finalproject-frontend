@@ -1,9 +1,9 @@
 <template>
   <v-row align="center" justify="space-between">
     <v-col cols="auto">
-      <div v-if="personIsLoading">加载中……</div>
-      <div v-else-if="personError">
-        <p class="text-error">{{ personError.message }}</p>
+      <div v-if="isLoading">加载中……</div>
+      <div v-else-if="error">
+        <p class="text-error">{{ error.message }}</p>
       </div>
 
       <div v-else class="d-flex">
@@ -22,46 +22,7 @@
 
   <v-divider class="my-4"></v-divider>
 
-  <div>
-    <v-skeleton-loader
-      v-if="isLoading"
-      type="image"
-      width="200"
-      class="mr-2"
-    ></v-skeleton-loader>
-
-    <div v-else-if="error">
-      <v-alert type="error" variant="text" title="出错了">
-        {{ error.message }}
-      </v-alert>
-    </div>
-
-    <div v-else-if="state" class="d-flex flex-wrap">
-      <div
-        v-for="photo in (state?.photos || [])"
-        :key="photo._id"
-        class="ma-1 photo"
-      >
-        <v-img
-          :src="photo.src"
-          :lazy-src="photo.src"
-          :width="200"
-          :max-width="200"
-          :aspect-ratio="1"
-          class="photo__img"
-          cover
-          @click="() => previewPhoto(photo)"
-        >
-          <!-- 图片加载失败时显示的默认图片 -->
-          <template v-slot:error>
-            <v-img height="200" width="200" src="/src/assets/image-placeholder.svg"></v-img>
-          </template>
-        </v-img>
-      </div>
-    </div>
-
-    <v-btn @click="nextPage">下一页</v-btn>
-  </div>
+  <Gallery v-model:selected="selected" :extraParams="{ person_id: route.params.id }"></Gallery>
 
   <v-dialog v-model="dialog" max-width="400">
     <v-card>
@@ -83,11 +44,13 @@
 <script setup>
 import { ref } from 'vue';
 import { useAsyncState } from '@vueuse/core'
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import request from '/src/request.js';
 
 const route = useRoute();
-const router = useRouter();
+
+// 选中的照片列表
+const selected = ref([]);
 
 // 是否显示 snackbar
 const snackbar = ref(false);
@@ -96,9 +59,9 @@ const snackbarText = ref('');
 // 获取人物详情
 const {
   state: person,
-  error: personError,
-  isLoading: personIsLoading,
-  execute: getPerson,
+  error,
+  isLoading,
+  execute,
 } = useAsyncState(async () => {
   try {
     const response = await request({
@@ -115,52 +78,6 @@ const {
     throw e;
   }
 });
-
-// 获取含有当前人物的所有照片
-const {
-  state,
-  error,
-  isLoading,
-  execute,
-} = useAsyncState(async (args) => {
-  try {
-    const response = await request({
-      method: 'get',
-      url: '/photos',
-      params: {
-        pagesize: 50,
-        cursor: args?.cursor,
-        person_id: route.params.id,
-      },
-    });
-
-    return {
-      photos: args?.cursor
-        ? [...state.value?.photos, ...response.data.data] // 有游标视为加载下一页，需要组合响应数据到旧数据中
-        : response.data.data, // 没有游标说明是第一次请求或者刷新数据，直接覆盖旧数据
-      cursor: response.data.cursor,
-    };
-  } catch (e) {
-    if (e.name === 'AxiosError') {
-      throw new Error(e.response.data?.msg || '服务异常！');
-    }
-
-    throw e;
-  }
-}, {
-  photos: [],
-  cursor: null,
-}, {
-  resetOnExecute: false, // 请求完成才覆盖 state 以避免页面“闪烁”
-});
-
-function nextPage() {
-  execute(0, { cursor: state.value?.cursor });
-}
-
-function previewPhoto(photo) {
-  router.push(`/photo/${photo._id}`);
-}
 
 const dialog = ref(false);
 const nameInput = ref('');
@@ -180,7 +97,7 @@ async function onSubmitName() {
       },
     });
 
-    getPerson(); // 重新加载人物详情
+    execute(); // 重新加载人物详情
     snackbarText.value = '修改成功';
     snackbar.value = true;
     dialog.value = false; // 关闭弹框
@@ -197,18 +114,5 @@ async function onSubmitName() {
 </script>
 
 <style scoped>
-.photo {
-  width: 200px;
-  height: 200px;
-  max-width: 200px;
-  max-height: 200px;
-  overflow: hidden;
-  position: relative;
-  transition: .2s;
-  background-color: #e9eef6;
-}
 
-.photo__img {
-  transition: .2s;
-}
 </style>
