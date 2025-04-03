@@ -142,7 +142,7 @@ function nextPage() {
 }
 
 function refresh() {
-  selected.value.length = 0; // 取消选中
+  selected.value = []; // 取消选中
   execute(0);
 }
 

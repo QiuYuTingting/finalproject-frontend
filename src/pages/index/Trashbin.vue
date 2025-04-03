@@ -1,18 +1,13 @@
 <template>
-  <v-row align="center" justify="space-between">
-    <v-col cols="auto">
-      <p class="text-h5">回收站</p>
-    </v-col>
-    <v-col cols="auto">
+  <PageToolbar title="回收站">
+    <template v-slot:actions>
       <v-btn
         variant="text"
         prepend-icon="mdi-delete-forever-outline"
         @click="onClickDeleteAll"
       >清空回收站</v-btn>
-    </v-col>
-  </v-row>
-
-  <v-divider class="my-4"></v-divider>
+    </template>
+  </PageToolbar>
 
   <Gallery
     v-model:selected="selected"

@@ -1,11 +1,5 @@
 <template>
-  <v-row align="center" justify="space-between">
-    <v-col cols="auto">
-      <p class="text-h5">创建相册</p>
-    </v-col>
-  </v-row>
-
-  <v-divider class="my-4"></v-divider>
+  <PageToolbar title="创建相册" showBack></PageToolbar>
 
   <v-row class="mt-8">
     <v-text-field

@@ -1,32 +1,24 @@
 <template>
-  <v-row align="center" justify="space-between">
-    <v-col cols="auto">
-      <div v-if="isLoading">
-        <v-progress-circular indeterminate></v-progress-circular>
-      </div>
-      <div v-else-if="error">
-        <p class="text-error">{{ error.message }}</p>
-      </div>
-      <div v-else class="d-flex">
-        <p class="text-h5">照片</p>
-      </div>
-    </v-col>
-    <v-col cols="auto" v-if="photo?.status === 'trashed'">
+  <PageToolbar
+    :isLoading="isLoading"
+    :error="error"
+    title="照片"
+    showBack
+  >
+    <template v-slot:actions v-if="photo?.status === 'trashed'">
       <v-btn variant="text" icon title="恢复" @click="onClickUntrash">
         <v-icon>mdi-restore</v-icon>
       </v-btn>
       <v-btn variant="text" icon title="永久删除" @click="onClickDeleteForever">
         <v-icon>mdi-delete-forever</v-icon>
       </v-btn>
-    </v-col>
-    <v-col cols="auto" v-else>
+    </template>
+    <template v-slot:actions v-else>
       <v-btn variant="text" icon title="删除照片" @click="onClickTrashbin">
         <v-icon>mdi-delete</v-icon>
       </v-btn>
-    </v-col>
-  </v-row>
-
-  <v-divider class="my-4"></v-divider>
+    </template>
+  </PageToolbar>
 
   <div v-if="photo" class="photo-container">
     <div>
@@ -43,18 +35,24 @@
     </div>
     <div>
       <v-list>
-        <v-list-subheader class="my-4" v-if="photo.faces?.length">人物</v-list-subheader>
+        <v-list-subheader class="my-4" v-if="photo.faces?.length">照片中的人脸</v-list-subheader>
 
-        <v-list-item
-          v-for="(face, index) in (photo.faces || [])/*.filter((face) => face.distance_from_who < 0.5)*/"
-          :key="`${face.who}_${index}`"
-          link
-          :to="`/person/${face.who}`"
-        >
-          <v-avatar size="72" class="border border-white" color="primary">
-            <v-img :src="face.face_base64 ? `data:image/jpeg;base64, ${face.face_base64}` : '/src/assets/image-placeholder.svg'" ></v-img>
-          </v-avatar>
-        </v-list-item>
+        <div class="d-flex flex-wrap">
+          <div
+            v-for="(face, index) in (photo.faces || [])/*.filter((face) => face.distance_from_who < 0.5)*/"
+            :key="`${face.who}_${index}`"
+          >
+            <v-list-item link :to="`/person/${face.who}`">
+              <v-avatar
+                size="72"
+                class="border border-white"
+                color="primary"
+              >
+                <v-img :src="face.face_base64 ? `data:image/jpeg;base64, ${face.face_base64}` : '/src/assets/image-placeholder.svg'" ></v-img>
+              </v-avatar>
+            </v-list-item>
+          </div>
+        </div>
 
         <v-list-subheader class="my-4">详情</v-list-subheader>
 

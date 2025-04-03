@@ -1,19 +1,21 @@
 <template>
-  <v-row align="center" justify="space-between">
-    <v-col cols="auto">
-      <p class="text-h5">{{ album?.name || '相册' }}</p>
-    </v-col>
-    <v-col cols="auto">
+  <PageToolbar
+    :isLoading="isLoading"
+    :error="error"
+    :title="album?.name || '相册'"
+    showBack
+  >
+    <template v-slot:prepend>
+    </template>
+    <template v-slot:actions>
       <v-btn variant="text" icon title="添加照片" @click="showPhotosSelector = true">
         <v-icon>mdi-plus-box-multiple</v-icon>
       </v-btn>
       <v-btn variant="text" icon title="删除相册" @click="onClickDeleteAlbum">
         <v-icon>mdi-delete</v-icon>
       </v-btn>
-    </v-col>
-  </v-row>
-
-  <v-divider class="my-4"></v-divider>
+    </template>
+  </PageToolbar>
 
   <Gallery ref="GalleryRef" v-model:selected="selected" :extraParams="{ album_id: route.params.id }"></Gallery>
 
@@ -39,7 +41,7 @@ const router = useRouter();
 // 获取相册详情
 const {
   state: album,
-  error, // TODO 模仿 person 页面展示错误信息
+  error,
   isLoading,
   execute,
 } = useAsyncState(async () => {

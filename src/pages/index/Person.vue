@@ -1,26 +1,21 @@
 <template>
-  <v-row align="center" justify="space-between">
-    <v-col cols="auto">
-      <div v-if="isLoading">加载中……</div>
-      <div v-else-if="error">
-        <p class="text-error">{{ error.message }}</p>
-      </div>
-
-      <div v-else class="d-flex">
-        <v-avatar size="32" class="border border-white mr-4" color="primary">
-          <v-img :src="person?.reference_face_base64 ? `data:image/jpeg;base64, ${person.reference_face_base64}` : '/src/assets/image-placeholder.svg'"></v-img>
-        </v-avatar>
-        <p class="text-h5">{{ person?.name || '未知人物' }}</p>
-      </div>
-    </v-col>
-    <v-col cols="auto">
+  <PageToolbar
+    :isLoading="isLoading"
+    :error="error"
+    :title="person?.name || '未知人物'"
+    showBack
+  >
+    <template v-slot:prepend>
+      <v-avatar size="32" class="border border-white mr-4" color="primary">
+        <v-img :src="person?.reference_face_base64 ? `data:image/jpeg;base64, ${person.reference_face_base64}` : '/src/assets/image-placeholder.svg'"></v-img>
+      </v-avatar>
+    </template>
+    <template v-slot:actions>
       <v-btn variant="text" icon title="编辑姓名" @click="dialog = true">
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
-    </v-col>
-  </v-row>
-
-  <v-divider class="my-4"></v-divider>
+    </template>
+  </PageToolbar>
 
   <Gallery v-model:selected="selected" :extraParams="{ person_id: route.params.id }"></Gallery>
 
