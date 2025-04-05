@@ -164,16 +164,21 @@
   </v-app>
 
   <PhotosUploader ref="PhotosUploaderRef" @success="onPhotosUploaded"></PhotosUploader>
+
+  <v-snackbar v-model="globalStore.showSnackbar"> {{ globalStore.snackbarText || '' }} </v-snackbar>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useAsyncState } from '@vueuse/core'
 import { useRoute, useRouter } from "vue-router";
+import { useGlobalStore } from './globalStore.js'
 import request from '/src/request.js';
 
 const route = useRoute();
 const router = useRouter();
+
+const globalStore = useGlobalStore();
 
 function onClickEnterAdmin() {
   window.location.replace('/admin/');

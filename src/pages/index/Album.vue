@@ -11,29 +11,58 @@
       <v-btn variant="text" icon title="添加照片" @click="showPhotosSelector = true">
         <v-icon>mdi-plus-box-multiple</v-icon>
       </v-btn>
-      <v-btn variant="text" icon title="删除相册" @click="onClickDeleteAlbum">
-        <v-icon>mdi-delete</v-icon>
+      <v-btn variant="text" icon title="编辑相册名" @click="dialog = true">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+      <v-btn variant="text" icon title="更多">
+        <v-icon>mdi-dots-vertical</v-icon>
+
+        <v-menu activator="parent">
+          <v-list class="pa-4">
+            <v-list-item link @click="onClickDeleteAlbum">
+              <template v-slot:prepend>
+                <v-icon>mdi-delete</v-icon>
+              </template>
+              <v-list-item-title>删除相册</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </v-btn>
     </template>
   </PageToolbar>
 
   <Gallery ref="GalleryRef" v-model:selected="selected" :extraParams="{ album_id: route.params.id }"></Gallery>
 
-  <v-snackbar v-model="snackbar"> {{ snackbarText }} </v-snackbar>
-
   <PhotosSelector
     v-model:show="showPhotosSelector"
     :excludeAlbum="album"
     @change="onSelectNewPhotos"
   ></PhotosSelector>
+
+  <v-dialog v-model="dialog" max-width="400">
+    <v-card>
+      <v-card-title>修改相册名称</v-card-title>
+      <v-card-text>
+        <v-text-field v-model="nameInput" label="相册名称" outlined></v-text-field>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="dialog = false">取消</v-btn>
+        <v-btn color="primary" @click="onSubmitName">提交</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import dayjs from 'dayjs';
+import { useGlobalStore } from './globalStore.js'
 import { useRoute, useRouter } from 'vue-router';
 import { useAsyncState } from '@vueuse/core';
 import request from '/src/request.js';
+
+const globalStore = useGlobalStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -67,10 +96,6 @@ const {
   }
 });
 
-// 是否显示 snackbar
-const snackbar = ref(false);
-const snackbarText = ref('');
-
 // 点击删除相册
 async function onClickDeleteAlbum() {
   if (confirm(`相册一经删除便无法恢复。不过，已删除相册中的照片仍会保留`)) {
@@ -83,10 +108,7 @@ async function onClickDeleteAlbum() {
       router.replace('/albums');
     } catch (e) {
       console.error(e);
-      snackbarText.value = e.name === 'AxiosError'
-        ? e.response.data?.msg || '服务异常！'
-        : e.message;
-      snackbar.value = true;
+      globalStore.snackbar(e.name === 'AxiosError' ? e.response.data?.msg || '服务异常！' : e.message);
     }
   }
 }
@@ -125,18 +147,45 @@ async function onSelectNewPhotos(newPhotos) {
 
     const { matchedCount, modifiedCount } = response.data.data;
 
-    snackbarText.value = matchedCount && modifiedCount
+    globalStore.snackbar(matchedCount && modifiedCount
       ? `已将 ${modifiedCount} 个照片（共 ${matchedCount} 个）添加到相册`
-      : response.data.msg;
-    snackbar.value = true;
+      : response.data.msg
+    );
 
     refreshPhotos();
   } catch (e) {
     console.error(e);
-    snackbarText.value = e.name === 'AxiosError'
-      ? e.response.data?.msg || '服务异常！'
-      : e.message;
-    snackbar.value = true;
+    globalStore.snackbar(e.name === 'AxiosError' ? e.response.data?.msg || '服务异常！' : e.message);
+  }
+}
+
+// 相册名编辑框
+const dialog = ref(false);
+const nameInput = ref('');
+
+async function onSubmitName() {
+  if (!nameInput.value) return;
+
+  try {
+    await request({
+      method: 'patch',
+      url: '/albums',
+      data: {
+        ids: [route.params.id],
+        updates: {
+          name: nameInput.value,
+        },
+      },
+    });
+
+    execute(); // 重新加载
+    globalStore.snackbar('修改成功');
+    dialog.value = false; // 关闭弹框
+  } catch (e) {
+    globalStore.snackbar(e.name === 'AxiosError'
+      ? (e.response.data?.msg || '服务异常！')
+      : e.message
+    );
   }
 }
 

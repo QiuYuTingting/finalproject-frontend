@@ -51,7 +51,8 @@ const extraParams = computed(() => {
 
 // 点击“完成”
 function onClickDone() {
-  emit('change', selected.value);
+  emit('change', [...selected.value]);
+  selected.value = [];
 }
 </script>
 

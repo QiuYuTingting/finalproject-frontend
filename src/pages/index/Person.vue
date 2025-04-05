@@ -32,24 +32,21 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-
-  <v-snackbar v-model="snackbar"> {{ snackbarText }} </v-snackbar>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useAsyncState } from '@vueuse/core'
+import { useGlobalStore } from './globalStore.js'
 import { useRoute } from 'vue-router';
 import request from '/src/request.js';
+
+const globalStore = useGlobalStore();
 
 const route = useRoute();
 
 // 选中的照片列表
 const selected = ref([]);
-
-// 是否显示 snackbar
-const snackbar = ref(false);
-const snackbarText = ref('');
 
 // 获取人物详情
 const {
@@ -93,17 +90,13 @@ async function onSubmitName() {
     });
 
     execute(); // 重新加载人物详情
-    snackbarText.value = '修改成功';
-    snackbar.value = true;
+    globalStore.snackbar('修改成功');
     dialog.value = false; // 关闭弹框
   } catch (e) {
-    if (e.name === 'AxiosError') {
-      snackbarText.value = e.response.data?.msg || '服务异常！'
-    } else {
-      snackbarText.value = e.message;
-    }
-
-    snackbar.value = true;
+    globalStore.snackbar(e.name === 'AxiosError'
+      ? (e.response.data?.msg || '服务异常！')
+      : e.message
+    );
   }
 }
 </script>

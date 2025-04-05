@@ -20,13 +20,14 @@
       <v-btn icon="mdi-delete-forever" title="删除" @click="onClickDeleteForever"></v-btn>
     </template>
   </Gallery>
-
-  <v-snackbar v-model="snackbar"> {{ snackbarText }} </v-snackbar>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import { useGlobalStore } from './globalStore.js'
 import request from '/src/request.js';
+
+const globalStore = useGlobalStore();
 
 // 选中的照片列表
 const selected = ref([]);
@@ -37,10 +38,6 @@ function refreshPhotos() {
   GalleryRef.value?.refresh();
 }
 
-// 是否显示 snackbar
-const snackbar = ref(false);
-const snackbarText = ref('');
-
 function requestWrapper(fn) {
   return async function(...args) {
     if (typeof fn !== 'function') return;
@@ -48,15 +45,14 @@ function requestWrapper(fn) {
     try {
       const msg = await fn.apply(null, args);
 
-      snackbarText.value = msg;
-      snackbar.value = true;
+      globalStore.snackbar(msg);
       refreshPhotos();
     } catch (e) {
       console.error(e);
-      snackbarText.value = e.name === 'AxiosError'
+      globalStore.snackbar(e.name === 'AxiosError'
         ? e.response.data?.msg || '服务异常！'
-        : e.message;
-      snackbar.value = true;
+        : e.message
+      );
     }
   }
 }

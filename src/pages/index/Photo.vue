@@ -9,9 +9,12 @@
       <v-btn variant="text" icon title="恢复" @click="onClickUntrash">
         <v-icon>mdi-restore</v-icon>
       </v-btn>
-      <v-btn variant="text" icon title="永久删除" @click="onClickDeleteForever">
+      <v-btn variant="text" icon title="永久删除" @click="() => onClickDeleteForever({ back: true })">
         <v-icon>mdi-delete-forever</v-icon>
       </v-btn>
+    </template>
+    <template v-slot:actions v-else-if="photo?.status === 'deleted'">
+      <v-btn disabled text>已永久删除</v-btn>
     </template>
     <template v-slot:actions v-else>
       <v-btn variant="text" icon title="删除照片" @click="onClickTrashbin">
@@ -80,11 +83,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import dayjs from 'dayjs';
 import { useAsyncState } from '@vueuse/core'
+import { useGlobalStore } from './globalStore.js';
 import { useRoute, useRouter } from 'vue-router';
 import request from '/src/request.js';
+
+const globalStore = useGlobalStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -121,9 +126,77 @@ const {
   }
 });
 
-const onClickDeleteForever = () => { alert('TODO') }
-const onClickTrashbin = () => { alert('TODO') }
-const onClickUntrash = () => { alert('TODO') }
+function requestWrapper(fn) {
+  return async function(...args) {
+    if (typeof fn !== 'function') return;
+
+    try {
+      const msg = await fn.apply(null, args);
+
+      globalStore.snackbar(msg);
+
+      if (args?.some((arg) => arg.back === true)) {
+        router.back();
+      }
+      execute(); // 刷新照片信息
+    } catch (e) {
+      console.error(e);
+      globalStore.snackbar(e.name === 'AxiosError'
+        ? e.response.data?.msg || '服务异常！'
+        : e.message
+      );
+    }
+  }
+}
+
+// 将照片移到回收站
+const onClickTrashbin = requestWrapper(async () => {
+  if (!confirm('确认将照片移至回收站吗？')) return;
+
+  const response = await request({
+    method: 'patch',
+    url: '/photos',
+    data: {
+      ids: [route.params.id],
+      updates: {
+        status: 'trashed',
+      },
+    },
+  });
+  return response.data.msg || '已将照片移至回收站';
+});
+
+// 恢复照片
+const onClickUntrash = requestWrapper(async () => {
+  const response = await request({
+    method: 'patch',
+    url: '/photos',
+    data: {
+      ids: [route.params.id],
+      updates: {
+        status: null,
+      },
+    },
+  });
+  return response.data.msg || '已恢复照片';
+});
+
+// 永久删除照片
+const onClickDeleteForever = requestWrapper(async () => {
+  if (!confirm('照片将被永久删除，无法恢复')) return;
+
+  const response = await request({
+    method: 'patch',
+    url: '/photos',
+    data: {
+      ids: [route.params.id],
+      updates: {
+        status: 'deleted',
+      },
+    },
+  });
+  return response.data.msg || '已永久删除照片';
+});
 </script>
 
 <style scoped>
