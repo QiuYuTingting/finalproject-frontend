@@ -3,6 +3,13 @@
     <template v-slot:actions>
       <v-btn icon="mdi-plus" title="添加到相册" @click="onClickAddToAlbum"></v-btn>
     </template>
+    <template v-slot:empty>
+      <v-empty-state
+        icon="mdi-image-frame"
+        headline="你还没有照片"
+        title="点击右上角 + 按钮开始上传"
+      ></v-empty-state>
+    </template>
   </Gallery>
 </template>
 

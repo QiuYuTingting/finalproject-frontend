@@ -71,7 +71,12 @@
       </v-item>
     </v-item-group>
 
-    <v-row justify="center" class="mt-4">
+    <v-row v-if="!isLoading && !error && state.photos?.length === 0" align="center" justify="center">
+      <v-col cols="auto">
+        <slot name="empty"></slot>
+      </v-col>
+    </v-row>
+    <v-row v-else justify="center" class="mt-4">
       <v-col cols="auto">
         <v-btn @click="nextPage" variant="text">下一页</v-btn>
       </v-col>

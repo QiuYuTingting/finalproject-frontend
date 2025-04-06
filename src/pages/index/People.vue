@@ -33,6 +33,16 @@
 
         <v-card-title class="">{{ person.name || '未知人物' }}</v-card-title>
       </v-card>
+
+      <v-row v-if="!people.length" align="center" justify="center">
+        <v-col cols="auto">
+          <v-empty-state
+            icon="mdi-face-recognition"
+            headline="尚未识别人物"
+            title="稍后回来查看"
+          ></v-empty-state>
+        </v-col>
+      </v-row>
     </div>
   </div>
 </template>

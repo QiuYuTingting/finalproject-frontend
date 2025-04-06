@@ -44,6 +44,17 @@
 
         <v-card-subtitle class="">{{ album.created_at }}</v-card-subtitle>
       </v-card>
+
+      <v-row v-if="!albums.length" align="center" justify="center">
+        <v-col cols="auto">
+          <v-empty-state
+            icon="mdi-image-album"
+            headline="您还没有创建任何相册"
+            action-text="新建相册"
+            @click:action="onClickCreateAlbum"
+          ></v-empty-state>
+        </v-col>
+      </v-row>
     </div>
   </div>
 

@@ -28,7 +28,7 @@
 
         <v-list-item link to="/people" class="rounded-pill py-3 px-6">
           <template v-slot:prepend>
-            <v-icon>mdi-human</v-icon>
+            <v-icon>mdi-face-man</v-icon>
           </template>
           <v-list-item-title>人物</v-list-item-title>
         </v-list-item>

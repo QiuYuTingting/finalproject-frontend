@@ -31,7 +31,16 @@
     </template>
   </PageToolbar>
 
-  <Gallery ref="GalleryRef" v-model:selected="selected" :extraParams="{ album_id: route.params.id }"></Gallery>
+  <Gallery ref="GalleryRef" v-model:selected="selected" :extraParams="{ album_id: route.params.id }">
+    <template v-slot:empty>
+      <v-empty-state
+        icon="mdi-image-plus"
+        headline="相册中无任何照片"
+        action-text="添加照片"
+        @click:action="showPhotosSelector = true"
+      ></v-empty-state>
+    </template>
+  </Gallery>
 
   <PhotosSelector
     v-model:show="showPhotosSelector"

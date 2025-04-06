@@ -19,6 +19,12 @@
       <v-btn icon="mdi-restore" title="恢复" @click="onClickUntrash"></v-btn>
       <v-btn icon="mdi-delete-forever" title="删除" @click="onClickDeleteForever"></v-btn>
     </template>
+    <template v-slot:empty>
+      <v-empty-state
+        icon="mdi-delete-empty"
+        headline="回收站中无内容"
+      ></v-empty-state>
+    </template>
   </Gallery>
 </template>
 

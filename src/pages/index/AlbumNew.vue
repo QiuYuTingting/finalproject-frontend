@@ -30,7 +30,7 @@
       <v-btn
         size="x-large"
         append-icon="mdi-arrow-right"
-        variant="text"
+        variant="outlined"
         @click="() => createAlbum()"
       >稍后添加</v-btn>
     </v-col>
