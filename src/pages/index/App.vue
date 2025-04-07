@@ -71,6 +71,8 @@
               prepend-inner-icon="mdi-magnify"
               placeholder="搜索"
               style="max-width: 450px; width: 450px;"
+              readonly
+              @click="router.push('/search')"
             ></v-text-field>
           </div>
 

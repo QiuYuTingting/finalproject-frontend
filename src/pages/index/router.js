@@ -59,6 +59,10 @@ const routes = [
     path: '/account',
     component: () => import('./Account'),
   },
+  {
+    path: '/search',
+    component: () => import('./Search'),
+  },
 ];
 
 const router = createRouter({

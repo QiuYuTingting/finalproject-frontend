@@ -14,6 +14,9 @@
       <v-btn variant="text" icon title="编辑姓名" @click="dialog = true">
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
+      <v-btn variant="text" icon title="隐藏" @click="onClickEye">
+        <v-icon>mdi-eye</v-icon>
+      </v-btn>
     </template>
   </PageToolbar>
 
@@ -38,12 +41,13 @@
 import { ref } from 'vue';
 import { useAsyncState } from '@vueuse/core'
 import { useGlobalStore } from './globalStore.js'
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import request from '/src/request.js';
 
 const globalStore = useGlobalStore();
 
 const route = useRoute();
+const router = useRouter();
 
 // 选中的照片列表
 const selected = ref([]);
@@ -92,6 +96,29 @@ async function onSubmitName() {
     execute(); // 重新加载人物详情
     globalStore.snackbar('修改成功');
     dialog.value = false; // 关闭弹框
+  } catch (e) {
+    globalStore.snackbar(e.name === 'AxiosError'
+      ? (e.response.data?.msg || '服务异常！')
+      : e.message
+    );
+  }
+}
+
+async function onClickEye() {
+  if (!confirm('确定要隐藏此人物吗？隐藏的人物不会再出现在人物列表中。')) return;
+
+  try {
+    await request({
+      method: 'patch',
+      url: '/people',
+      data: {
+        ids: [route.params.id],
+        updates: {
+          hide: true,
+        },
+      },
+    });
+    router.back();
   } catch (e) {
     globalStore.snackbar(e.name === 'AxiosError'
       ? (e.response.data?.msg || '服务异常！')
